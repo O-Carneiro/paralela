@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "num_threads.h"
 
 double c_x_min;
@@ -183,9 +184,42 @@ void compute_mandelbrot(){
 }
 
 int main(int argc, char *argv[]){
+    // Declare clock_t variables to measure time
+    clock_t start, end;
+    double cpu_time_used, total = 0;
+
+    // Measure time for init
+    start = clock();
     init(argc, argv);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    total += cpu_time_used;
+    printf("Time for init: %f seconds\n", cpu_time_used);
+
+    // Measure time for allocate_image_buffer
+    start = clock();
     allocate_image_buffer();
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    total += cpu_time_used;
+    printf("Time for allocate_image_buffer: %f seconds\n", cpu_time_used);
+
+    // Measure time for compute_mandelbrot
+    start = clock();
     compute_mandelbrot();
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Time for compute_mandelbrot: %f seconds\n", cpu_time_used);
+
+    // Measure time for writing to file
+    start = clock();
     write_to_file();
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    total += cpu_time_used;
+    printf("Time for write_to_file: %f seconds\n", cpu_time_used);
+
+    printf("Total I/O time + allocation time: %f seconds\n", total);
+
     return 0;
 }

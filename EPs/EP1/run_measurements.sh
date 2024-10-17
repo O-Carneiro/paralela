@@ -8,7 +8,7 @@ INITIAL_SIZE=16
 
 SIZE=$INITIAL_SIZE
 
-NAMES=('mandelbrot_seq' 'mandelbrot_pth' 'mandelbrot_omp')
+NAMES=('mandelbrot_pth' 'mandelbrot_omp')
 
 make
 mkdir results
