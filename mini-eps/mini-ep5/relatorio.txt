@@ -1,0 +1,40 @@
+Implemetação:
+O programa pede 2 inputs: o número de sapos (N) e
+o número de simulações (S) a serem rodadas.
+Depois disso, faz o seguinte S vezes:
+Cria uma barreira de tamanho 2*N 
+Libera 2*N threads (metade sapos e metade rãs)
+As 2*N threads alcançam a barreira
+Todas as threads competem por um mutex e tentam andar
+uma ou duas casas.
+Quando um animal tenta pular mas não consegue, um contador
+é implementado.
+Quando esse contador atinge 1000 * N, o programa assume um 
+deadlock e mata as threads 
+Se uma simulação resolve o problema, a solução é impressa.
+O programa imprime quantas vezes o problema foi solucionado.
+
+O que acontece com o problema?
+
+1. Para qualquer número de animais, existem apenas
+2 strings de movimentos que resolvem o problema. Contudo, a 
+quantidade de strings possíveis é muito grande*. Como a chance de 
+resolver o problema (sem considerar starvation) é:
+        StringsCertas/StringsPossíveis = 2/StringsPossíveis,
+É extremamente improvável que o problema seja resolvido aleatoriamente 
+pelo escalonador. Então, para 3 ou mais sapos (6+ animais) já 
+nos deparamos com <1% (pelos meus testes) de chance de resolver o problema.
+
+2. Para 5 sapos/rãs (10 animais), simulando 30.000 vezes, o 
+problema foi solucionado 0 vezes. 
+
+3. Para 3 sapos/rãs (6 animais), simulando 30.000 vezes, o
+problema foi solucionado 4 vezes (0.013%).
+
+4. todas as vezes que o progrma para é por que o contador 
+passou de 1000 * N, então não achei interessante colocar 
+esse dado no relatório.
+
+*Se o comprimento das strings de movimentos que solucionam é
+(N*(N+2)), é trivial ver que a quantidade de strings "erradas"
+cresce muito rápido com N.

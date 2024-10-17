@@ -1,0 +1,8 @@
+O programa otimizado:
+- Foi compilado com a flag O3
+- Não usa um vetor de tempos, apenas decrementa nT
+economizando um loop de tamanho nT-1
+- Faz a primeira iteração do loop principal fora dele,
+economizando um if - else
+- Usa um loop while ao inves de um loop for, desprezivelmente mais rapido.
+

@@ -1,0 +1,12 @@
+dgemm_0:
+Tempo médio: 114.389433
+Tempo maximo: 116.116242
+Tempo minimo: 111.968953
+dgemm_1:
+Tempo médio: 6.682655
+Tempo maximo: 6.899562
+Tempo minimo: 6.668439
+dgemm_2:
+Tempo médio: 4.984312
+Tempo maximo: 5.187841
+Tempo minimo: 4.933314
