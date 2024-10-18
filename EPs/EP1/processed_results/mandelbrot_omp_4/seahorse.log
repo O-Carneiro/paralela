@@ -1,0 +1,148 @@
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 16' (10 runs):
+
+              0,93 msec task-clock                       #    1,162 CPUs utilized               ( +-  1,00% )
+                 0      context-switches                 #    0,000 /sec                      
+                 0      cpu-migrations                   #    0,000 /sec                      
+                77      page-faults                      #   83,112 K/sec                       ( +-  0,51% )
+         2.660.857      cycles                           #    2,872 GHz                         ( +-  7,72% )
+         2.811.156      instructions                     #    1,06  insn per cycle              ( +-  0,10% )
+           441.871      branches                         #  476,947 M/sec                       ( +-  0,12% )
+     <not counted>      branch-misses                                                           ( +- 34,61% )  (0,00%)
+
+         0,0007976 +- 0,0000102 seconds time elapsed  ( +-  1,28% )
+
+Some events weren't counted. Try disabling the NMI watchdog:
+	echo 0 > /proc/sys/kernel/nmi_watchdog
+	perf stat ...
+	echo 1 > /proc/sys/kernel/nmi_watchdog
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 32' (10 runs):
+
+              1,96 msec task-clock                       #    1,782 CPUs utilized               ( +-  1,15% )
+                 0      context-switches                 #    0,000 /sec                      
+                 0      cpu-migrations                   #    0,000 /sec                      
+                79      page-faults                      #   40,346 K/sec                       ( +-  0,35% )
+         4.867.681      cycles                           #    2,486 GHz                         ( +- 11,75% )
+         6.089.894      instructions                     #    1,25  insn per cycle              ( +-  0,10% )
+           825.153      branches                         #  421,415 M/sec                       ( +-  0,12% )
+     <not counted>      branch-misses                                                           ( +- 32,32% )  (0,00%)
+
+        0,00109900 +- 0,00000984 seconds time elapsed  ( +-  0,90% )
+
+Some events weren't counted. Try disabling the NMI watchdog:
+	echo 0 > /proc/sys/kernel/nmi_watchdog
+	perf stat ...
+	echo 1 > /proc/sys/kernel/nmi_watchdog
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 64' (10 runs):
+
+              5,99 msec task-clock                       #    2,804 CPUs utilized               ( +-  1,15% )
+                 0      context-switches                 #    0,000 /sec                      
+                 0      cpu-migrations                   #    0,000 /sec                      
+                78      page-faults                      #   13,030 K/sec                       ( +-  0,51% )
+        17.470.539      cycles                           #    2,919 GHz                         ( +-  6,23% )  (73,36%)
+        17.231.230      instructions                     #    0,99  insn per cycle              ( +-  4,23% )
+         2.351.087      branches                         #  392,764 M/sec                       ( +-  0,06% )
+             8.833      branch-misses                    #    0,38% of all branches             ( +-  9,12% )  (56,89%)
+
+         0,0021350 +- 0,0000277 seconds time elapsed  ( +-  1,30% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 128' (10 runs):
+
+             23,73 msec task-clock                       #    3,621 CPUs utilized               ( +-  0,17% )
+                 0      context-switches                 #    0,000 /sec                      
+                 0      cpu-migrations                   #    0,000 /sec                      
+                78      page-faults                      #    3,287 K/sec                       ( +-  0,39% )
+        72.037.649      cycles                           #    3,036 GHz                         ( +-  0,25% )  (70,79%)
+        71.479.618      instructions                     #    0,99  insn per cycle              ( +-  0,28% )  (66,27%)
+         8.358.693      branches                         #  352,283 M/sec                       ( +-  0,31% )  (81,74%)
+            20.744      branch-misses                    #    0,25% of all branches             ( +-  5,43% )  (82,96%)
+
+        0,00655323 +- 0,00000859 seconds time elapsed  ( +-  0,13% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 256' (10 runs):
+
+             92,30 msec task-clock                       #    3,896 CPUs utilized               ( +-  0,10% )
+                 1      context-switches                 #   10,834 /sec                        ( +- 30,55% )
+                 0      cpu-migrations                   #    0,000 /sec                      
+                78      page-faults                      #  845,054 /sec                        ( +-  0,51% )
+       287.493.105      cycles                           #    3,115 GHz                         ( +-  0,10% )  (73,99%)
+       283.361.346      instructions                     #    0,99  insn per cycle              ( +-  0,34% )  (73,96%)
+        32.476.189      branches                         #  351,848 M/sec                       ( +-  0,42% )  (77,39%)
+            67.840      branch-misses                    #    0,21% of all branches             ( +-  1,02% )  (75,86%)
+
+         0,0236938 +- 0,0000132 seconds time elapsed  ( +-  0,06% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 512' (10 runs):
+
+            346,81 msec task-clock                       #    3,802 CPUs utilized               ( +-  0,06% )
+                 4      context-switches                 #   11,534 /sec                        ( +- 14,04% )
+                 0      cpu-migrations                   #    0,000 /sec                      
+                78      page-faults                      #  224,907 /sec                        ( +-  0,51% )
+     1.091.600.510      cycles                           #    3,148 GHz                         ( +-  0,05% )  (74,84%)
+     1.111.543.607      instructions                     #    1,02  insn per cycle              ( +-  0,06% )  (75,13%)
+       129.438.196      branches                         #  373,225 M/sec                       ( +-  0,02% )  (75,47%)
+           251.235      branch-misses                    #    0,19% of all branches             ( +-  0,60% )  (74,76%)
+
+         0,0912134 +- 0,0000431 seconds time elapsed  ( +-  0,05% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 1024' (10 runs):
+
+          1.280,51 msec task-clock                       #    3,590 CPUs utilized               ( +-  0,22% )
+                 7      context-switches                 #    5,467 /sec                        ( +- 14,76% )
+                 0      cpu-migrations                   #    0,000 /sec                      
+                78      page-faults                      #   60,913 /sec                        ( +-  0,46% )
+     4.044.267.573      cycles                           #    3,158 GHz                         ( +-  0,02% )  (74,94%)
+     4.425.469.286      instructions                     #    1,09  insn per cycle              ( +-  0,03% )  (75,02%)
+       512.232.954      branches                         #  400,024 M/sec                       ( +-  0,02% )  (75,10%)
+           953.556      branch-misses                    #    0,19% of all branches             ( +-  0,07% )  (74,95%)
+
+          0,356650 +- 0,000716 seconds time elapsed  ( +-  0,20% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 2048' (10 runs):
+
+          4.975,65 msec task-clock                       #    3,523 CPUs utilized               ( +-  0,11% )
+                18      context-switches                 #    3,618 /sec                        ( +-  5,25% )
+                 1      cpu-migrations                   #    0,201 /sec                        ( +- 37,12% )
+                78      page-faults                      #   15,676 /sec                        ( +-  0,47% )
+    15.762.797.116      cycles                           #    3,168 GHz                         ( +-  0,07% )  (74,99%)
+    17.670.744.785      instructions                     #    1,12  insn per cycle              ( +-  0,01% )  (75,01%)
+     2.042.166.925      branches                         #  410,432 M/sec                       ( +-  0,01% )  (75,00%)
+         3.732.560      branch-misses                    #    0,18% of all branches             ( +-  0,05% )  (74,99%)
+
+          1,412291 +- 0,000811 seconds time elapsed  ( +-  0,06% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 4096' (10 runs):
+
+         19.735,80 msec task-clock                       #    3,504 CPUs utilized               ( +-  0,07% )
+                51      context-switches                 #    2,584 /sec                        ( +-  4,69% )
+                 3      cpu-migrations                   #    0,152 /sec                        ( +- 23,33% )
+                78      page-faults                      #    3,952 /sec                        ( +-  0,28% )
+    62.582.172.041      cycles                           #    3,171 GHz                         ( +-  0,03% )  (75,00%)
+    70.641.100.783      instructions                     #    1,13  insn per cycle              ( +-  0,00% )  (75,00%)
+     8.160.972.371      branches                         #  413,511 M/sec                       ( +-  0,00% )  (75,00%)
+        14.773.981      branch-misses                    #    0,18% of all branches             ( +-  0,04% )  (75,01%)
+
+           5,63288 +- 0,00364 seconds time elapsed  ( +-  0,06% )
+
+
+ Performance counter stats for './mandelbrot_omp -0.8 -0.7 0.05 0.15 8192' (10 runs):
+
+         78.703,64 msec task-clock                       #    3,497 CPUs utilized               ( +-  0,04% )
+               176      context-switches                 #    2,236 /sec                        ( +-  2,52% )
+                 9      cpu-migrations                   #    0,114 /sec                        ( +-  7,26% )
+                78      page-faults                      #    0,991 /sec                        ( +-  0,46% )
+   249.806.921.487      cycles                           #    3,174 GHz                         ( +-  0,01% )  (75,00%)
+   282.529.430.621      instructions                     #    1,13  insn per cycle              ( +-  0,00% )  (75,00%)
+    32.635.991.004      branches                         #  414,669 M/sec                       ( +-  0,00% )  (75,00%)
+        58.757.750      branch-misses                    #    0,18% of all branches             ( +-  0,02% )  (75,00%)
+
+          22,50753 +- 0,00968 seconds time elapsed  ( +-  0,04% )
+

@@ -22,4 +22,4 @@ $(OUTPUT)_seq: $(OUTPUT)_seq.c
 
 .PHONY: clean
 clean:
-	rm $(OUTPUT)_omp $(OUTPUT)_pth $(OUTPUT)_seq *$(IMAGE) *.log
+	rm $(OUTPUT)_omp $(OUTPUT)_pth $(OUTPUT)_seq 

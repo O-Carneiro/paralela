@@ -148,7 +148,7 @@ void compute_mandelbrot(){
                 z_x_squared = z_x * z_x;
                 z_y_squared = z_y * z_y;
             }
-            update_rgb_buffer(iteration, i_x, i_y);
+            // update_rgb_buffer(iteration, i_x, i_y);
         }
     }
 }
