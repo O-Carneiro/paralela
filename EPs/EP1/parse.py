@@ -4,7 +4,7 @@ import csv
 
 # Regular expression to match the argument and time with stddev
 arg_pattern = re.compile(r"Performance counter stats for '\./mandelbrot_... [-\d.]+ [-\d.]+ [-\d.]+ [-\d.]+ (\d+)'")
-time_pattern = re.compile(r"\s+(\d+,\d+) \+- (\d+,\d+) seconds time elapsed\s+\( \+-  (\d+,\d+)% \)")
+time_pattern = re.compile(r"\s+(\d+,\d+) \+- (\d+,\d+) seconds time elapsed\s+\( \+-\s+(\d+,\d+)% \)")
 
 def parse_files(input_dir):
     # Directory containing the input files
