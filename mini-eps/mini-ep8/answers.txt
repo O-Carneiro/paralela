@@ -1,0 +1,27 @@
+Tarefa 1;
+1. O Maelstrom simula um sistema distribuído usando nós e uma
+rede que manda mensagens entre eles. Os nós representados por
+"n" (n1,n2,n3,etc) são instâncias do binário que o Maelstrom 
+vai simular, implementando seu sistema distribuído. Nós repre-
+sentados por "c", são os clientes internos do Maelstrom.
+2. Node.Reply(msg, body) responde a alguma mensagem (msg) com
+um texto (body). Ela seta automaticamente a fonte e o destino
+na estrutra correta e associa a resposta à mensagem sendo res-
+pondida.
+3. Node.run() executa o loop de manageamento de eventos. Ela 
+lê a mensagem do STDIN as delega para o handler correto.
+
+Tarefa 2:
+1. Usando um mutex mu.Sync, eu juntei o get e o incrementCounter()
+em uma função só, que pega o mutex, atribui id = counter, incremen-
+ta o counter, e solta o mutex. Assim, não temos mais problemas de 
+concorrência com read/write na variável, já que a operação foi pro-
+tegida com um mutex.
+
+2. Solução: Troquei a função de geração de ID por generateID(counter,
+nodeID) que retorna uma string "<counter>-<Id do Nó>" onde counter
+é um contador local para cada nó, que é incrementado depois
+de todo ID gerado.
+Os nós são 100% independentes na geração de IDs. Então, são toleran-
+tes a partição e conseguem responder sempre um cliente.
+
