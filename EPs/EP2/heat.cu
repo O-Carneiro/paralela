@@ -15,6 +15,13 @@
 int threads_per_block;
 int blocks_in_grid;
 
+typedef struct {
+	int blockX;
+	int blockY;
+	int gridX;
+	int gridY;
+} cudaData;
+
 void initialize(double **h, int n)
 {
     int fireplace_start = (FIREPLACE_START * n) / ROOM_SIZE;
@@ -79,18 +86,17 @@ void save_to_file(double **h, int n, char *filename)
 }
 
 __global__ void jacobi_kernel(double *d_h, double *d_g, int n) {
-    int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
-    int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
-
-    if (i >= n || j >= n) return;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
     if (i > 0 && i < n - 1 && j > 0 && j < n - 1) {
         d_g[i * n + j] = 0.25 * (d_h[(i - 1) * n + j] + d_h[(i + 1) * n + j] +
                                  d_h[i * n + (j - 1)] + d_h[i * n + (j + 1)]);
+		d_h[i*n + j] = d_g[i*n + j]; 
     }
+
 }
 
-void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit) {
-    // Flatten the 2D arrays
+void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData arg) {
     double *h_flat = (double *)malloc(n * n * sizeof(double));
     double *g_flat = (double *)malloc(n * n * sizeof(double));
     for (int i = 0; i < n; i++) {
@@ -100,40 +106,24 @@ void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit) {
         }
     }
 
-    // Allocate device memory
     double *d_h, *d_g;
     cudaMalloc(&d_h, n * n * sizeof(double));
     cudaMalloc(&d_g, n * n * sizeof(double));
-
-    // Copy data from host to device
     cudaMemcpy(d_h, h_flat, n * n * sizeof(double), cudaMemcpyHostToDevice);
 
-    // Define thread block and grid sizes
-    dim3 blockDim(16, 16);
-    dim3 gridDim((n + blockDim.x - 1) / blockDim.x, (n + blockDim.y - 1) / blockDim.y);
+	dim3 blockDim(arg.blockX, arg.blockY);
+	dim3 gridDim(arg.gridX, arg.gridY);
 
-    // Perform Jacobi iterations
     for (int iter = 0; iter < iter_limit; iter++) {
         jacobi_kernel<<<gridDim, blockDim>>>(d_h, d_g, n);
         cudaDeviceSynchronize();
-
-        // Swap pointers
-        double *temp = d_h;
-        d_h = d_g;
-        d_g = temp;
     }
-
-    // Copy data back to host
     cudaMemcpy(h_flat, d_h, n * n * sizeof(double), cudaMemcpyDeviceToHost);
-
-    // Un-flatten the data back into 2D arrays
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             h[i][j] = h_flat[i * n + j];
         }
     }
-
-    // Free resources
     free(h_flat);
     free(g_flat);
     cudaFree(d_h);
@@ -171,9 +161,11 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Warning: Not enough threads to cover the problem size.\n");
         return 1;
     }
-
-    dim3 blockDim(block_x, block_y);
-    dim3 gridDim(grid_x, grid_y);
+	cudaData arg;
+	arg.blockX = block_x;
+	arg.blockY = block_y;
+	arg.gridX = grid_x;
+	arg.gridY = grid_y;
 
     double **h = (double **)malloc(n * sizeof(double *));
     double **g = (double **)malloc(n * sizeof(double *));
@@ -196,27 +188,28 @@ int main(int argc, char *argv[])
 
     struct timespec start, end;
     initialize(h, n);
-    char filename[256] = "host.txt";
+    char filename[256] = "device.txt";
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    jacobi_iteration_cu(h, g, n, iter_limit, arg);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    save_to_file(h, n, filename);
+
+    double elapsed_time_d = calculate_elapsed_time(start, end);
+    printf("%.9f,", elapsed_time_d);
+
+    initialize(h, n);
+
+    strcpy(filename, "host.txt");
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     jacobi_iteration_host(h, g, n, iter_limit);
     clock_gettime(CLOCK_MONOTONIC, &end);
     save_to_file(h, n, filename);
 
-    double elapsed_time = calculate_elapsed_time(start, end);
-    printf("Tempo de execução host: %.9f segundos\n", elapsed_time);
-
-    initialize(h, n);
-
-    strcpy(filename, "device.txt");
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    jacobi_iteration_cu(h, g, n, iter_limit);
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    save_to_file(h, n, filename);
-
-    elapsed_time = calculate_elapsed_time(start, end);
-    printf("Tempo de execução device: %.9f segundos\n", elapsed_time);
+    double elapsed_time_h = calculate_elapsed_time(start, end);
+    printf("%.9f,", elapsed_time_h);
+	printf("%.9f\n", elapsed_time_d/elapsed_time_h);
 
     for (int i = 0; i < n; i++)
     {
