@@ -91,7 +91,14 @@ __global__ void jacobi_kernel(double *d_h, double *d_g, int n) {
     if (i > 0 && i < n - 1 && j > 0 && j < n - 1) {
         d_g[i * n + j] = 0.25 * (d_h[(i - 1) * n + j] + d_h[(i + 1) * n + j] +
                                  d_h[i * n + (j - 1)] + d_h[i * n + (j + 1)]);
-		d_h[i*n + j] = d_g[i*n + j]; 
+    }
+
+}
+__global__ void g_to_h(double *d_h, double *d_g, int n) {
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i > 0 && i < n - 1 && j > 0 && j < n - 1) {
+        d_h[i * n + j] = d_g[i*n+j];
     }
 
 }
@@ -116,6 +123,8 @@ void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData
 
     for (int iter = 0; iter < iter_limit; iter++) {
         jacobi_kernel<<<gridDim, blockDim>>>(d_h, d_g, n);
+        cudaDeviceSynchronize();
+        g_to_h<<<gridDim, blockDim>>>(d_h, d_g, n);
         cudaDeviceSynchronize();
     }
     cudaMemcpy(h_flat, d_h, n * n * sizeof(double), cudaMemcpyDeviceToHost);
@@ -209,7 +218,7 @@ int main(int argc, char *argv[])
 
     double elapsed_time_h = calculate_elapsed_time(start, end);
     printf("%.9f,", elapsed_time_h);
-	printf("%.9f\n", elapsed_time_d/elapsed_time_h);
+	printf("%.9f\n", elapsed_time_h/elapsed_time_d);
 
     for (int i = 0; i < n; i++)
     {
