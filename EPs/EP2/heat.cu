@@ -94,14 +94,6 @@ __global__ void jacobi_kernel(double *d_h, double *d_g, int n) {
     }
 
 }
-__global__ void g_to_h(double *d_h, double *d_g, int n) {
-    int i = blockIdx.y * blockDim.y + threadIdx.y;
-    int j = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i > 0 && i < n - 1 && j > 0 && j < n - 1) {
-        d_h[i * n + j] = d_g[i*n+j];
-    }
-
-}
 
 void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData arg) {
     double *h_flat = (double *)malloc(n * n * sizeof(double));
@@ -124,8 +116,9 @@ void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData
     for (int iter = 0; iter < iter_limit; iter++) {
         jacobi_kernel<<<gridDim, blockDim>>>(d_h, d_g, n);
         cudaDeviceSynchronize();
-        g_to_h<<<gridDim, blockDim>>>(d_h, d_g, n);
-        cudaDeviceSynchronize();
+        double *temp = d_h;
+        d_h = d_g;
+        d_g = temp;
     }
     cudaMemcpy(h_flat, d_h, n * n * sizeof(double), cudaMemcpyDeviceToHost);
     for (int i = 0; i < n; i++) {
