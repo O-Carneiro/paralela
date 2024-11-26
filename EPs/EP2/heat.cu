@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
         printf("The results do not match!\n");
     }
 
-    printf("Speedup (GPU/CPU): %.2f\n", elapsed_time_d / elapsed_time_h);
+    printf("Speedup (CPU/GPU): %.2f\n", elapsed_time_h / elapsed_time_d);
 
     for (int i = 0; i < n; i++) {
         free(h_host[i]);
