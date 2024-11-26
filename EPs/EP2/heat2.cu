@@ -7,6 +7,7 @@
 
 #define WALL_TEMP 20.0
 #define FIREPLACE_TEMP 100.0
+#define BODY_TEMP 37.0 // Temperatura do corpo
 #define FIREPLACE_START 3
 #define FIREPLACE_END 7
 #define ROOM_SIZE 10
@@ -18,7 +19,7 @@ typedef struct {
     int gridY;
 } cudaData;
 
-void initialize(double **matrix, int n) {
+void initialize(double **matrix, int n, int body_start, int body_end) {
     int fireplace_start = (FIREPLACE_START * n) / ROOM_SIZE;
     int fireplace_end = (FIREPLACE_END * n) / ROOM_SIZE;
 
@@ -26,6 +27,8 @@ void initialize(double **matrix, int n) {
         for (int j = 0; j < n; j++) {
             if (i == 0 || i == n - 1 || j == 0 || j == n - 1) {
                 matrix[i][j] = (i == n - 1 && j >= fireplace_start && j <= fireplace_end) ? FIREPLACE_TEMP : WALL_TEMP;
+            } else if (i >= body_start && i <= body_end && j >= body_start && j <= body_end) {
+                matrix[i][j] = BODY_TEMP;
             } else {
                 matrix[i][j] = 0.0;
             }
@@ -33,39 +36,47 @@ void initialize(double **matrix, int n) {
     }
 }
 
-void jacobi_iteration_host(double **h, double **g, int n, int iter_limit) {
+void jacobi_iteration_host(double **h, double **g, int n, int iter_limit, int body_start, int body_end) {
     for (int iter = 0; iter < iter_limit; iter++) {
         for (int i = 1; i < n - 1; i++) {
             for (int j = 1; j < n - 1; j++) {
-                g[i][j] = 0.25 * (h[i - 1][j] + h[i + 1][j] + h[i][j - 1] + h[i][j + 1]);
+                if (!(i >= body_start && i <= body_end && j >= body_start && j <= body_end)) {
+                    g[i][j] = 0.25 * (h[i - 1][j] + h[i + 1][j] + h[i][j - 1] + h[i][j + 1]);
+                }
             }
         }
         for (int i = 1; i < n - 1; i++) {
             for (int j = 1; j < n - 1; j++) {
-                h[i][j] = g[i][j];
+                if (!(i >= body_start && i <= body_end && j >= body_start && j <= body_end)) {
+                    h[i][j] = g[i][j];
+                }
             }
         }
     }
 }
 
-__global__ void jacobi_kernel(double *d_h, double *d_g, int n) {
+__global__ void jacobi_kernel(double *d_h, double *d_g, int n, int body_start, int body_end) {
     int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
     int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
     if (i > 0 && i < n - 1 && j > 0 && j < n - 1) {
-        d_g[i * n + j] = 0.25 * (d_h[(i - 1) * n + j] + d_h[(i + 1) * n + j] +
-                                 d_h[i * n + (j - 1)] + d_h[i * n + (j + 1)]);
+        if (!(i >= body_start && i <= body_end && j >= body_start && j <= body_end)) {
+            d_g[i * n + j] = 0.25 * (d_h[(i - 1) * n + j] + d_h[(i + 1) * n + j] +
+                                     d_h[i * n + (j - 1)] + d_h[i * n + (j + 1)]);
+        }
     }
 }
 
-__global__ void g_to_h(double *d_h, double *d_g, int n) {
+__global__ void g_to_h(double *d_h, double *d_g, int n, int body_start, int body_end) {
     int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
     int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
     if (i > 0 && i < n - 1 && j > 0 && j < n - 1) {
-        d_h[i * n + j] = d_g[i * n + j];
+        if (!(i >= body_start && i <= body_end && j >= body_start && j <= body_end)) {
+            d_h[i * n + j] = d_g[i * n + j];
+        }
     }
 }
 
-void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData arg) {
+void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData arg, int body_start, int body_end) {
     double *h_flat = (double *)malloc(n * n * sizeof(double));
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -98,9 +109,9 @@ void jacobi_iteration_cu(double **h, double **g, int n, int iter_limit, cudaData
     // Run Jacobi kernel
     cudaEventRecord(start, 0);
     for (int iter = 0; iter < iter_limit; iter++) {
-        jacobi_kernel<<<gridDim, blockDim>>>(d_h, d_g, n);
+        jacobi_kernel<<<gridDim, blockDim>>>(d_h, d_g, n, body_start, body_end);
         cudaDeviceSynchronize();
-        g_to_h<<<gridDim, blockDim>>>(d_h, d_g, n);
+        g_to_h<<<gridDim, blockDim>>>(d_h, d_g, n, body_start, body_end);
         cudaDeviceSynchronize();
     }
     cudaEventRecord(stop, 0);
@@ -178,6 +189,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Define the body hot area
+    int body_start = n / 4;
+    int body_end = n / 4 + n / 10;
+
     double **h_host = (double **)malloc(n * sizeof(double *));
     double **g_host = (double **)malloc(n * sizeof(double *));
     double **h_device = (double **)malloc(n * sizeof(double *));
@@ -194,12 +209,12 @@ int main(int argc, char *argv[]) {
     cudaData arg = { block_x, block_y, grid_x, grid_y };
 
     struct timespec start, end;
-    initialize(h_host, n);
-    initialize(h_device, n);
+    initialize(h_host, n, body_start, body_end);
+    initialize(h_device, n, body_start, body_end);
 
     // GPU computation
     clock_gettime(CLOCK_MONOTONIC, &start);
-    jacobi_iteration_cu(h_device, g_host, n, iter_limit, arg);
+    jacobi_iteration_cu(h_device, g_host, n, iter_limit, arg, body_start, body_end);
     clock_gettime(CLOCK_MONOTONIC, &end);
     double elapsed_time_d = calculate_elapsed_time(start, end);
     printf("GPU Total time: %.9f seconds\n", elapsed_time_d);
@@ -207,7 +222,7 @@ int main(int argc, char *argv[]) {
 
     // CPU computation
     clock_gettime(CLOCK_MONOTONIC, &start);
-    jacobi_iteration_host(h_host, g_host, n, iter_limit);
+    jacobi_iteration_host(h_host, g_host, n, iter_limit, body_start, body_end);
     clock_gettime(CLOCK_MONOTONIC, &end);
     double elapsed_time_h = calculate_elapsed_time(start, end);
     printf("CPU Total time: %.9f seconds\n", elapsed_time_h);
