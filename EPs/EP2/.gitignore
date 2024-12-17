@@ -1,0 +1,12 @@
+# Binaries
+heat
+heatCu
+heatCu2
+
+# Output images
+host.png
+device.png
+
+# Output texts
+host.txt
+device.txt
