@@ -142,9 +142,14 @@ void write_bmp_img(FILE *output_file, unsigned char *pixels, int height, int wid
 int main(int argc, char **argv){
     if(argc != 2){
         fprintf(stderr,"\033[31;1mErro de formato\033[0m \nUso correto: ./sequential_julia <n>\n");
-        return -1;
+        return 1;
     } 
     int n = atoi(argv[1]);
+    if(n < 0){
+        fprintf(stderr,"\033[31;1mErro no argumento\033[0m \nn deve ser positivo.\n");
+        return 2;
+    } 
+
     int height = n, width = 2*n;
     unsigned char *pixels = malloc(6*n*n*sizeof(unsigned char));
     FILE *output_file = fopen("julia.bmp", "w+");
