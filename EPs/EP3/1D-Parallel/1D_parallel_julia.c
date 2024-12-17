@@ -4,6 +4,7 @@
 #include<mpi.h>
 
 #define TINT_BIAS 1.0
+#define MSG_SIZE 11
 
 /*
  * compute_julia_pixel(): calcula os valores RGB de um pixel em
@@ -61,14 +62,17 @@ int compute_julia_pixel(int x, int y, int width, int height, float tint_bias, un
   return 0;
 }
 
-void compute_julia_img(unsigned char *pixels, int height, int width){
+void compute_julia_rows(unsigned char *pixels, int first_row, int last_row, int height, int width){
     unsigned char* rgb = malloc(3*sizeof(unsigned char));
-    for(int y=0; y < height; y++) 
+    int row_index = 0;
+    for(int y=first_row; y < last_row; y++){
         for(int x=0; x < width; x++){
             compute_julia_pixel(x, y, width, height, TINT_BIAS, rgb);
             //Escreve o pixel no array
-            for(int i=0; i < 3; i++) pixels[y*3*width+x*3+i]=rgb[i];   
+            for(int i=0; i < 3; i++) pixels[row_index*3*width+x*3+i]=rgb[i];   
         }
+        row_index++;
+    }
     free(rgb);
 }
 
@@ -162,23 +166,43 @@ int main(int argc, char **argv){
     MPI_Get_processor_name(hostname, &hostname_len);
 
     int height = n, width = 2*n;
-    int top, bottom, row_amount;
+    int first_row, last_row, row_amount;
     row_amount = height/size; 
-    top = (row_amount)*rank;
-    bottom = top+row_amount-1;
+    first_row = (row_amount)*rank;
+    last_row = first_row+row_amount-1;
 
+    unsigned char *pixels = malloc(3*row_amount*width*sizeof(unsigned char));
+
+
+    //Payload da mensagem
+    char msg[10] = "EP coxasso";
+    char *buffer = malloc(MSG_SIZE*sizeof(char));
+
+    if(rank > 0) MPI_Recv(buffer, sizeof(char)*MSG_SIZE, MPI_BYTE, rank-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) ;
     printf("[Processo %d de %d]: Devo computar da linha %d até %d, um total de %d linhas.\n"
-           , rank, size, top, bottom, row_amount);
+           , rank, size, first_row, last_row, row_amount);
 
-    unsigned char *pixels = malloc(row_amount*width*sizeof(unsigned char));
 
-    FILE *output_file = fopen("julia.bmp", "w");
-    
-    if(rank == 0) write_bmp_header(output_file, width, height);
-    // compute_julia_img(pixels, height, width);  
-    // write_bmp_img(output_file, pixels, height, width);
+    double start_time = MPI_Wtime();
+    compute_julia_rows(pixels, first_row, last_row, height, width);  
+    double end_time = MPI_Wtime();
+
+    printf("[Processo %d de %d]: Passei %.2f s calculando o valor dos pixels.\n", rank, size, end_time - start_time);
+
+    FILE *output_file;
+    if(rank == 0) {
+        output_file = fopen("1D-julia.bmp", "w");
+        write_bmp_header(output_file, width, height);
+    }else {
+        output_file = fopen("1D-julia.bmp", "a");
+    }
+    write_bmp_img(output_file, pixels, row_amount, width);
+    fclose(output_file);
+
+    if(rank < size-1) MPI_Send(msg, sizeof(msg), MPI_BYTE, rank+1, 0, MPI_COMM_WORLD);
 
     free(pixels);
+    free(buffer);
     MPI_Finalize();
     return 0;
 }

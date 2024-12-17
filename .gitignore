@@ -1,7 +1,7 @@
 maelstrom
 .clangd
 simple_cluster*
-smpitmp-appz7kKMD
+smpitmp*
 #Un-ignore Makefile
 !Makefile 
 
