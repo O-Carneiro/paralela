@@ -162,13 +162,23 @@ int main(int argc, char **argv){
     MPI_Get_processor_name(hostname, &hostname_len);
 
     int height = n, width = 2*n;
-    unsigned char *pixels = malloc(6*n*n*sizeof(unsigned char));
-    FILE *output_file = fopen("julia.bmp", "w+");
+    int top, bottom, row_amount;
+    row_amount = height/size; 
+    top = (row_amount)*rank;
+    bottom = top+row_amount-1;
+
+    printf("[Processo %d de %d]: Devo computar da linha %d até %d, um total de %d linhas.\n"
+           , rank, size, top, bottom, row_amount);
+
+    unsigned char *pixels = malloc(row_amount*width*sizeof(unsigned char));
+
+    FILE *output_file = fopen("julia.bmp", "w");
     
-    write_bmp_header(output_file, width, height);
-    compute_julia_img(pixels, height, width);  
-    write_bmp_img(output_file, pixels, height, width);
+    if(rank == 0) write_bmp_header(output_file, width, height);
+    // compute_julia_img(pixels, height, width);  
+    // write_bmp_img(output_file, pixels, height, width);
 
     free(pixels);
+    MPI_Finalize();
     return 0;
 }
