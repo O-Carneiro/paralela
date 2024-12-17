@@ -1,0 +1,7 @@
+Data transfer to device: 0.93 ms
+Kernel execution: 2657.32 ms
+Data transfer to host: 1.03 ms
+GPU Total time: 2.736590707 seconds
+CPU Total time: 5.039330765 seconds
+The results match within the tolerance.
+Speedup (CPU/GPU): 1.84

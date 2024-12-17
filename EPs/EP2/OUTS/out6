@@ -1,0 +1,8 @@
+Data transfer to device: 0.93 ms
+Kernel execution: 0.85 ms
+Data transfer to host: 0.94 ms
+GPU Total time: 0.075101772 seconds
+CPU Total time: 5.075086897 seconds
+Mismatch at (1, 1): host = 19.974573, device = 0.000000
+The results do not match!
+Speedup (CPU/GPU): 67.58
