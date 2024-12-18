@@ -1,0 +1,53 @@
+[Processo 0 de 25]: Devo computar da linha 0 até 199, um total de 200 linhas.
+                     Passei 0.35 s calculando o valor dos pixels.
+[Processo 1 de 25]: Devo computar da linha 200 até 399, um total de 200 linhas.
+                     Passei 0.37 s calculando o valor dos pixels.
+[Processo 2 de 25]: Devo computar da linha 400 até 599, um total de 200 linhas.
+                     Passei 0.44 s calculando o valor dos pixels.
+[Processo 3 de 25]: Devo computar da linha 600 até 799, um total de 200 linhas.
+                     Passei 0.42 s calculando o valor dos pixels.
+[Processo 4 de 25]: Devo computar da linha 800 até 999, um total de 200 linhas.
+                     Passei 0.51 s calculando o valor dos pixels.
+[Processo 5 de 25]: Devo computar da linha 1000 até 1199, um total de 200 linhas.
+                     Passei 0.61 s calculando o valor dos pixels.
+[Processo 6 de 25]: Devo computar da linha 1200 até 1399, um total de 200 linhas.
+                     Passei 0.91 s calculando o valor dos pixels.
+[Processo 7 de 25]: Devo computar da linha 1400 até 1599, um total de 200 linhas.
+                     Passei 0.90 s calculando o valor dos pixels.
+[Processo 8 de 25]: Devo computar da linha 1600 até 1799, um total de 200 linhas.
+                     Passei 1.07 s calculando o valor dos pixels.
+[Processo 9 de 25]: Devo computar da linha 1800 até 1999, um total de 200 linhas.
+                     Passei 1.16 s calculando o valor dos pixels.
+[Processo 10 de 25]: Devo computar da linha 2000 até 2199, um total de 200 linhas.
+                     Passei 1.15 s calculando o valor dos pixels.
+[Processo 11 de 25]: Devo computar da linha 2200 até 2399, um total de 200 linhas.
+                     Passei 1.16 s calculando o valor dos pixels.
+[Processo 12 de 25]: Devo computar da linha 2400 até 2599, um total de 200 linhas.
+                     Passei 1.22 s calculando o valor dos pixels.
+[Processo 13 de 25]: Devo computar da linha 2600 até 2799, um total de 200 linhas.
+                     Passei 1.16 s calculando o valor dos pixels.
+[Processo 14 de 25]: Devo computar da linha 2800 até 2999, um total de 200 linhas.
+                     Passei 1.15 s calculando o valor dos pixels.
+[Processo 15 de 25]: Devo computar da linha 3000 até 3199, um total de 200 linhas.
+                     Passei 1.17 s calculando o valor dos pixels.
+[Processo 16 de 25]: Devo computar da linha 3200 até 3399, um total de 200 linhas.
+                     Passei 1.07 s calculando o valor dos pixels.
+[Processo 17 de 25]: Devo computar da linha 3400 até 3599, um total de 200 linhas.
+                     Passei 1.09 s calculando o valor dos pixels.
+[Processo 18 de 25]: Devo computar da linha 3600 até 3799, um total de 200 linhas.
+                     Passei 0.78 s calculando o valor dos pixels.
+[Processo 19 de 25]: Devo computar da linha 3800 até 3999, um total de 200 linhas.
+                     Passei 0.61 s calculando o valor dos pixels.
+[Processo 20 de 25]: Devo computar da linha 4000 até 4199, um total de 200 linhas.
+                     Passei 0.66 s calculando o valor dos pixels.
+[Processo 21 de 25]: Devo computar da linha 4200 até 4399, um total de 200 linhas.
+                     Passei 0.41 s calculando o valor dos pixels.
+[Processo 22 de 25]: Devo computar da linha 4400 até 4599, um total de 200 linhas.
+                     Passei 0.46 s calculando o valor dos pixels.
+[Processo 23 de 25]: Devo computar da linha 4600 até 4799, um total de 200 linhas.
+                     Passei 0.38 s calculando o valor dos pixels.
+[Processo 24 de 25]: Devo computar da linha 4800 até 4999, um total de 200 linhas.
+                     Passei 0.35 s calculando o valor dos pixels.
+
+
+docker run --rm -it -v $(pwd):/home/smpi --user $(id -u):$(id -g) henricasanova/ics632_smpi smpirun -np 25 -hostfile ./simple_cluster_hostfile.txt -platform ./simple_cluster.xml ./1D_parallel_julia 5000

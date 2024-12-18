@@ -1,0 +1,4 @@
+seq, parallel, number of processors
+0.298, 0.683, 2
+0.298, 0.706, 4
+0.298, 0.694, 8 

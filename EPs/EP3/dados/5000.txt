@@ -1,0 +1,4 @@
+seq, parallel, number of processors
+22.004, 15.632, 2
+22.004, 11.040, 4
+22.004, 8.300, 8 

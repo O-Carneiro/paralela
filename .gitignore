@@ -1,5 +1,6 @@
 maelstrom
 .clangd
+*.bmp
 simple_cluster*
 smpitmp*
 #Un-ignore Makefile
