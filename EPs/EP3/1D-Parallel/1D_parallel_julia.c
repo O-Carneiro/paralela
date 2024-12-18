@@ -65,7 +65,7 @@ int compute_julia_pixel(int x, int y, int width, int height, float tint_bias, un
 void compute_julia_rows(unsigned char *pixels, int first_row, int last_row, int height, int width){
     unsigned char* rgb = malloc(3*sizeof(unsigned char));
     int row_index = 0;
-    for(int y=first_row; y < last_row; y++){
+    for(int y=first_row; y <= last_row; y++){
         for(int x=0; x < width; x++){
             compute_julia_pixel(x, y, width, height, TINT_BIAS, rgb);
             //Escreve o pixel no array
@@ -169,7 +169,7 @@ int main(int argc, char **argv){
     int first_row, last_row, row_amount;
     row_amount = height/size; 
     first_row = (row_amount)*rank;
-    last_row = first_row+row_amount;
+    last_row = first_row+row_amount-1;
 
     unsigned char *pixels = malloc(3*row_amount*width*sizeof(unsigned char));
 
