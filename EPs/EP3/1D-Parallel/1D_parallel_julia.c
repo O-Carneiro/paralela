@@ -169,10 +169,15 @@ int main(int argc, char **argv){
     int first_row, last_row, row_amount;
     row_amount = height/size; 
     first_row = (row_amount)*rank;
-    last_row = first_row+row_amount-1;
+    last_row = first_row+row_amount;
 
     unsigned char *pixels = malloc(3*row_amount*width*sizeof(unsigned char));
 
+
+
+    double start_time = MPI_Wtime();
+    compute_julia_rows(pixels, first_row, last_row, height, width);  
+    double end_time = MPI_Wtime();
 
     //Payload da mensagem
     char msg[10] = "EP coxasso";
@@ -181,13 +186,7 @@ int main(int argc, char **argv){
     if(rank > 0) MPI_Recv(buffer, sizeof(char)*MSG_SIZE, MPI_BYTE, rank-1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) ;
     printf("[Processo %d de %d]: Devo computar da linha %d até %d, um total de %d linhas.\n"
            , rank, size, first_row, last_row, row_amount);
-
-
-    double start_time = MPI_Wtime();
-    compute_julia_rows(pixels, first_row, last_row, height, width);  
-    double end_time = MPI_Wtime();
-
-    printf("[Processo %d de %d]: Passei %.2f s calculando o valor dos pixels.\n", rank, size, end_time - start_time);
+    printf("                     Passei %.2f s calculando o valor dos pixels.\n", end_time - start_time);
 
     FILE *output_file;
     if(rank == 0) {
